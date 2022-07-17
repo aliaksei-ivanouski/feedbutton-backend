@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:15432/fetocan?allowMultiQueries=true&renderGroupConcatMaxLenSessionVariable=false
+    username: fetocan
+    password: letmein
+  redis:
+    host: localhost
+    port: 16379
+    password: letmein
+
+springdoc:
+  swagger-ui:
+  #    supported-submit-methods: []
+
+app:
+  cache:
+    timeToLive:
+      default: 60
+      user: 60
+      venue: 60
+
+logging:
+  level:
+    org:
+      jooq: DEBUG

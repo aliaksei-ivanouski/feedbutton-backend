@@ -1,0 +1,42 @@
+server:
+  servlet:
+    context-path: /api
+  port: ${PORT:8080}
+  error:
+    include-exception: true
+    include-message: always
+    whitelabel:
+      enabled: false
+
+
+spring:
+  cache:
+    type: redis
+    redis:
+#      time-to-live: 10m
+      key-prefix: fb
+  jpa:
+    hibernate:
+      ddl-auto: none
+  jooq:
+    sql-dialect: postgres
+
+springdoc:
+  swagger-ui:
+    path: /docs
+    groups-order: asc
+    operations-sorter: method
+  api-docs:
+    path: /api-docs
+
+security:
+  jwt:
+    token-prefix: Bearer
+    token-header: X-Auth-Token
+    refresh-token-header: X-Refresh-Token
+    signing-key: ${JWT_KEY:A8qL2G(B,Q&HLKW2*l&Zcvmswuf^32*p10sdfj&}
+
+#logging:
+#  level:
+#    com.fetocan.feedbutton.service: TRACE
+#    org.springframework: TRACE

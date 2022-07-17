@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  redis:
+    host: ${SPRING_REDIS_HOST}
+    port: ${SPRING_REDIS_PORT}
+    password: ${SPRING_REDIS_PASSWORD}
+
+springdoc:
+  swagger-ui:
+#      supported-submit-methods: []
+
+app:
+  cache:
+    timeToLive:
+      default: 360 #1 * 60 * 60
+      user: 360 #1 * 60 * 60
+      venue: 360 #1 * 60 * 60

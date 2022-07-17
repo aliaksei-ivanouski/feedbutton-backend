@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  app:
+    build: ""
+    ports:
+      - 18080:8080
+    expose:
+      - 18080
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/fetocan?allowMultiQueries=true&renderGroupConcatMaxLenSessionVariable=false
+      - SPRING_DATASOURCE_USERNAME=fetocan
+      - SPRING_DATASOURCE_PASSWORD=letmein
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=letmein
+      - SPRING_PROFILES_ACTIVE=dev
+    networks:
+      - fetocan
+
+  db:
+    image: postgres
+    ports:
+      - 15432:5432
+    environment:
+      - POSTGRES_USER=fetocan
+      - POSTGRES_PASSWORD=letmein
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U fetocan" ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - ./_db:/var/lib/postgresql/data
+    networks:
+      - fetocan
+
+  redis:
+    image: redis:latest
+    environment:
+      REDIS_PASSWORD: letmein
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli", "ping" ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    ports:
+      - '16379:6379'
+    expose:
+      - '16379'
+    volumes:
+      - ./_redis:/data
+    networks:
+      - fetocan
+
+# Names our volume
+volumes:
+  my-db:
+  redis-data:
+
+networks:
+  fetocan:
+
+
+#docker-compose down -v
+#docker-compose up -d
