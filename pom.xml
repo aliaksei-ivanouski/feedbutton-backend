@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.fetocan.feedbutton</groupId>
 	<artifactId>feedbutton</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>feedbutton</name>
 	<description>Feed Button backend</description>
 
