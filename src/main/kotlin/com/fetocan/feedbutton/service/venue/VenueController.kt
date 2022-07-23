@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/v1/venues")
@@ -18,7 +19,7 @@ class VenueController(
     @GetVenueDoc
     @GetMapping("/{id}")
     fun getVenue(
-        @VenueIdDoc @PathVariable id: Long
+        @VenueIdDoc @PathVariable id: UUID
     ) = venueService.getVenue(id)
 
     @GetVenuesDoc
@@ -31,7 +32,7 @@ class VenueController(
     )
 
     @GetVenuesWithManagersDoc
-    @GetMapping("/users")
+    @GetMapping("/managers")
     fun getVenuesWithManagers(
         @PageableDoc pageable: Pageable
     ) = venueService.getVenuesWithManagers(

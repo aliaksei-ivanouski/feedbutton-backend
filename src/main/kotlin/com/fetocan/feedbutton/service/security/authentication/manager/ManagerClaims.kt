@@ -4,9 +4,10 @@ import com.fetocan.feedbutton.service.manager.Manager
 import com.fetocan.feedbutton.service.manager.ManagerRole
 import com.fetocan.feedbutton.service.security.authentication.AuthClaims
 import com.fetocan.feedbutton.service.util.tryOrNull
+import java.util.UUID
 
 data class ManagerClaims(
-    val id: Long,
+    val id: UUID,
     val email: String,
     val name: String,
     val managerRole: ManagerRole
@@ -26,7 +27,7 @@ data class ManagerClaims(
 
     constructor(map: Map<String, Any?>) : this(
         map["sub"]?.toString()
-            ?.let { tryOrNull { it.toLong() } }
+            ?.let { tryOrNull { UUID.fromString(it) } }
             ?: throw RuntimeException("id is required"),
         map["email"]?.toString()
             ?: throw RuntimeException("email is required"),

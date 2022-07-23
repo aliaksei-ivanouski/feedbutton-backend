@@ -5,6 +5,7 @@ import com.fetocan.feedbutton.service.security.authorization.Auth
 import org.springframework.security.access.expression.SecurityExpressionRoot
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations
 import org.springframework.security.core.Authentication
+import java.util.UUID
 
 class CustomMethodSecurityExpressionRoot(
     private val managerAccountService: ManagerService,
@@ -39,16 +40,16 @@ class CustomMethodSecurityExpressionRoot(
         return target
     }
 
-    fun isMe(principalId: Long) = Auth.isMe(principalId, authentication)
+    fun isMe(principalId: UUID) = Auth.isMe(principalId, authentication)
 
     fun isAdmin() = Auth.isAdmin(authentication)
     fun isManager() = Auth.isManager(authentication)
     fun isUser() = Auth.isUser(authentication)
 
-    fun hasAccess(venueId: Long, resourceType: String, permission: String) =
+    fun hasAccess(venueId: UUID, resourceType: String, permission: String) =
         Auth.hasAccess(venueId, resourceType, permission, authentication)
 
-    fun hasOrgAccess(orgId: Long, resourceType: String, permission: String) =
+    fun hasOrgAccess(orgId: UUID, resourceType: String, permission: String) =
         Auth.hasOrgAccess(orgId, resourceType, permission, authentication)
 
 }

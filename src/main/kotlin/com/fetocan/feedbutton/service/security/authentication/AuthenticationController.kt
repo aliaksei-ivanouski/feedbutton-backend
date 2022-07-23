@@ -8,12 +8,14 @@ import com.fetocan.feedbutton.service.security.authentication.manager.ManagerCla
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
@@ -109,10 +111,10 @@ class AuthenticationController(
             throw BadCredentialsException("Bad credentials")
         }
 
-//        if (manager.status == Manager.Status.INACTIVE) {
-//            response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.reasonPhrase)
-//            throw AccessDeniedException("account is inactive")
-//        }
+        if (manager.status == Manager.Status.INACTIVE) {
+            response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.reasonPhrase)
+            throw AccessDeniedException("account is inactive")
+        }
 
         val claims = ManagerClaims(manager)
         val token = jwtHelper.createToken(manager.id.toString(), claims.toMap(), 0L)
@@ -138,7 +140,7 @@ class AuthenticationController(
     data class AppUserAuthPayload(
         val email: String,
         val password: String,
-        val venueId: Long
+        val venueId: UUID
     )
 
     @Schema(name = "ManagerAuthPayload")
@@ -163,11 +165,11 @@ class AuthenticationController(
 
     @Schema(name = "TempCustomerResponse")
     data class TempCustomerResponse(
-        val id: Long,
+        val id: UUID,
         val email: String,
         val name: String,
         val photoUrl: String?,
-        val venueId: Long?,
+        val venueId: UUID?,
         val accessScopes:  Array<String>?
     )
 

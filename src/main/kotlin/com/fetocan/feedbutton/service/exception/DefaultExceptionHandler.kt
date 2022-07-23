@@ -1,8 +1,10 @@
 package com.fetocan.feedbutton.service.exception
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fetocan.feedbutton.service.exception.ErrorCodes.ACCESS_DENIED
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.BindException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -29,6 +31,7 @@ class DefaultExceptionHandler(
         exception: Exception
     ): ModelAndView {
         val httpStatus = resolveResponseStatus(exception)
+        val errorCode = resolveCustomResponseCode(exception)
         //This will support both BindException(for get method without @RequestBody) & MethodArgumentNotValidException which is subclass of BindException.
         val ex = if (exception is BindException)
             buildPrettyMessageForFieldValidation(exception)
@@ -36,7 +39,7 @@ class DefaultExceptionHandler(
 
         val attributeValue = ErrorModel(
             timestamp = Instant.now().toString(),
-            code = if (ex is BaseRestException) ex.code else "error.internal.server",
+            code = errorCode,
             status = httpStatus.value(),
             path = request.servletPath,
             error = ex.javaClass.simpleName,
@@ -56,11 +59,11 @@ class DefaultExceptionHandler(
     private fun resolveResponseStatus(
         exception: Exception
     ): HttpStatus {
-        val mergedAnnotation: ResponseStatus? = AnnotatedElementUtils.findMergedAnnotation(
+        return AnnotatedElementUtils.findMergedAnnotation(
             exception.javaClass,
             ResponseStatus::class.java
         )
-        return mergedAnnotation?.code
+            ?.code
             ?: getCustomResponseStatus(exception)
     }
 
@@ -71,8 +74,17 @@ class DefaultExceptionHandler(
         return when (exception) {
             is HttpClientErrorException.NotFound -> HttpStatus.NOT_FOUND
             is MethodArgumentNotValidException -> HttpStatus.BAD_REQUEST
+            is AccessDeniedException -> HttpStatus.FORBIDDEN
             else -> HttpStatus.INTERNAL_SERVER_ERROR
         }
+    }
+
+    private fun resolveCustomResponseCode(
+        exception: Exception
+    ) = when (exception) {
+        is BaseRestException -> exception.code
+        is AccessDeniedException -> ACCESS_DENIED
+        else -> "error.internal.server"
     }
 
     private fun buildPrettyMessageForFieldValidation(

@@ -1,5 +1,6 @@
 package com.fetocan.feedbutton.service.security.authentication.manager
 
+import com.fetocan.feedbutton.service.manager.Manager
 import com.fetocan.feedbutton.service.manager.ManagerRole
 import com.fetocan.feedbutton.service.manager.ManagerService
 import com.fetocan.feedbutton.service.security.authentication.JwtAuthenticationProvider
@@ -8,9 +9,11 @@ import com.fetocan.feedbutton.service.security.authentication.jwt.JwtHelper
 import com.fetocan.feedbutton.service.security.authentication.jwt.JwtSettings
 import com.fetocan.feedbutton.service.util.tryOrNull
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import java.util.UUID
 
 class ManagerJwtAuthenticationProvider(
     jwtSettings: JwtSettings,
@@ -26,15 +29,15 @@ class ManagerJwtAuthenticationProvider(
             return null
         }
 
-        val id = claims["sub"]?.toString()?.let { tryOrNull { it.toLong() } }
+        val id = claims["sub"]?.toString()?.let { tryOrNull { UUID.fromString(it) } }
             ?: throw BadCredentialsException("valid sub is required")
 
         // consider putting accessScopes into token
         val manager = managerService.findByIdOrNull(id)
             ?: throw BadCredentialsException("valid sub is required")
 
-//        if (manager.status == ManagerAccount.Status.INACTIVE)
-//            throw AccessDeniedException("account is inactive")
+        if (manager.status == Manager.Status.INACTIVE)
+            throw AccessDeniedException("account is inactive")
 
         val managerClaims = ManagerClaims(claims)
 

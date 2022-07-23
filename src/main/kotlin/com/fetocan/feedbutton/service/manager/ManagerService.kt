@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 
 @Service
@@ -34,7 +35,7 @@ class ManagerService(
     private val logger by LoggerDelegate()
 
     fun getManagerById(
-        id: Long
+        id: UUID
     ): Manager.BasicProjection {
         val currentIp = RemoteAddressResolver.resolveAddressFromRequest()
             ?.let { Inet(it.hostAddress) }
@@ -57,7 +58,7 @@ class ManagerService(
     }
 
     fun getVenueMappings(
-        accountId: Long
+        accountId: UUID
     ): List<ManagerVenueMapping> =
         dsl
             .select(MANAGER_VENUE.asterisk())
@@ -66,14 +67,16 @@ class ManagerService(
             .fetch().into(ManagerVenueMapping::class.java)
 
     fun getVenueMapping(
-        accountId: Long,
-        venueId: Long
+        accountId: UUID,
+        venueId: UUID
     ): ManagerVenueMapping? =
         dsl
             .select(MANAGER_VENUE.asterisk())
             .from(MANAGER_VENUE)
-            .where(MANAGER_VENUE.MANAGER_ID.eq(accountId)
-                .and(MANAGER_VENUE.VENUE_ID.eq(venueId)))
+            .where(
+                MANAGER_VENUE.MANAGER_ID.eq(accountId)
+                    .and(MANAGER_VENUE.VENUE_ID.eq(venueId))
+            )
             .fetchOneInto(ManagerVenueMapping::class.java)
 
     fun <T : Manager.Projection> getManagers(
@@ -108,7 +111,11 @@ class ManagerService(
                         VENUE.NAME
                     )
                         .from(VENUE)
-                        .where(VENUE.ID.eq(MANAGER.VENUE_ID))
+                        .join(MANAGER_VENUE)
+                        .on(
+                            VENUE.ID.eq(MANAGER_VENUE.VENUE_ID)
+                                .and(MANAGER.ID.eq(MANAGER_VENUE.MANAGER_ID))
+                        )
                 ).`as`("venues").convertFrom {
                     it.into(Venue.BasicProjection::class.java)
                 }
@@ -120,5 +127,52 @@ class ManagerService(
         val count = count()
 
         return PageImpl(result, pageable, count)
+    }
+
+    fun createManager(
+        account: Manager,
+        sendInvite: Boolean = false
+    ): Manager {
+        if (!account.isNew) {
+            throw IllegalArgumentException("ManagerAccount should be a new one")
+        }
+        val newAccount = saveAndFlush(account)
+        if (sendInvite) {
+//            sendInvitation(newAccount)
+        }
+        return newAccount
+    }
+
+    fun hasVenueMapping(
+        accountId: UUID,
+        venueId: UUID
+    ): Boolean = dsl.fetchExists(
+        MANAGER_VENUE,
+        MANAGER_VENUE.MANAGER_ID.eq(accountId).and(MANAGER_VENUE.VENUE_ID.eq(venueId))
+    )
+
+    fun createVenueMapping(
+        mapping: ManagerVenueMapping
+    ) = createVenueMappings(listOf(mapping))
+
+    fun createVenueMappings(
+        mappings: List<ManagerVenueMapping>
+    ) {
+        var statement = dsl.insertInto(
+            MANAGER_VENUE,
+            MANAGER_VENUE.MANAGER_ID,
+            MANAGER_VENUE.VENUE_ID,
+            MANAGER_VENUE.ACCESS_SCOPES
+        )
+
+        mappings.forEach {
+            statement = statement.values(
+                it.managerId,
+                it.venueId,
+                it.accessScopes
+            )
+        }
+
+        statement.execute()
     }
 }

@@ -9,6 +9,8 @@ import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
 import java.io.Serializable
+import java.util.UUID
+import javax.persistence.Column
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 import javax.persistence.PostLoad
@@ -22,13 +24,13 @@ import javax.persistence.PostPersist
 )
 @MappedSuperclass
 abstract class AbstractBaseEntity(
-    givenId: Long? = null
-): AuditedEntity(), PersistableSerializable<Long>, Serializable {
+    givenId: UUID? = null
+): AuditedEntity(), PersistableSerializable<UUID>, Serializable {
 
     @Id
-    private val id: Long = givenId ?: 0
+    private val id: UUID = givenId ?: UUID.randomUUID()
 
-    override fun getId(): Long = id
+    override fun getId(): UUID = id
 
     @Transient
     private var persisted: Boolean = givenId != null

@@ -5,8 +5,10 @@ import com.fetocan.feedbutton.service.jooq.Tables.MANAGER
 import com.fetocan.feedbutton.service.LoggerDelegate
 import com.fetocan.feedbutton.service.exception.ErrorCodes.VENUE_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
+import com.fetocan.feedbutton.service.jooq.Tables.MANAGER_VENUE
 import com.fetocan.feedbutton.service.jooq.paged
 import com.fetocan.feedbutton.service.manager.Manager
+import com.fetocan.feedbutton.service.manager.ManagerRole
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
@@ -15,6 +17,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 @Transactional
@@ -26,7 +29,7 @@ class VenueService(
     private val logger by LoggerDelegate()
 
     fun getVenue(
-        id: Long
+        id: UUID
     ) = findById(id)
         .map {
             Venue.BasicProjection(it)
@@ -67,8 +70,11 @@ class VenueService(
                 multiset(
                     select(MANAGER.asterisk())
                         .from(MANAGER)
-                        .where(MANAGER.VENUE_ID.eq(VENUE.ID))
-                ).`as`("users").convertFrom {
+                        .join(MANAGER_VENUE)
+                        .on(MANAGER.ID.eq(MANAGER_VENUE.MANAGER_ID)
+                            .and(VENUE.ID.eq(MANAGER_VENUE.VENUE_ID)))
+                        .where(MANAGER.ROLE.eq(ManagerRole.VENUE_MANAGER.name))
+                ).`as`("managers").convertFrom {
                     it.into(Manager.BasicProjection::class.java)
                 }
             )

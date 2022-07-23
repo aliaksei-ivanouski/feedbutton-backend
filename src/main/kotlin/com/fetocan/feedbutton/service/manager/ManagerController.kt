@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/v1/managers")
@@ -19,7 +20,7 @@ class ManagerController(
     @GetManagerDoc
     @GetMapping("/{id}")
     fun getManager(
-        @ManagerIdDoc @PathVariable id: Long
+        @ManagerIdDoc @PathVariable id: UUID
     ) = managerService.getManagerById(id)
 
     @GetManagersDoc

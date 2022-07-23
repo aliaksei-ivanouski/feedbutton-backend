@@ -15,6 +15,7 @@ spring:
     redis:
 #      time-to-live: 10m
       key-prefix: fb
+      cache-null-values: true
   jpa:
     hibernate:
       ddl-auto: none

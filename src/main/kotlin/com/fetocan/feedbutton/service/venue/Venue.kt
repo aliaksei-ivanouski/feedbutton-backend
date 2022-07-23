@@ -5,13 +5,14 @@ import com.fetocan.feedbutton.service.manager.Manager
 import io.swagger.v3.oas.annotations.media.Schema
 import java.io.Serializable
 import java.time.Instant
+import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
 @Table(name = "venue")
 class Venue(
-    id: Long? = null,
+    id: UUID? = null,
     val name: String
 ): AbstractBaseEntity(id), Serializable {
 
@@ -19,7 +20,7 @@ class Venue(
 
     @Schema(name = "VenueBasicProjection")
     open class BasicProjection(
-        val id: Long,
+        val id: UUID?,
         val name: String,
         val updatedAt: Instant?,
         val createdAt: Instant?
@@ -34,7 +35,7 @@ class Venue(
 
     @Schema(name = "VenueFullProjection")
     open class VenueFullProjection(
-        id: Long,
+        id: UUID?,
         name: String,
         updatedAt: Instant?,
         createdAt: Instant?,

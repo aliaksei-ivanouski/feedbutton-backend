@@ -12,6 +12,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 object Auth : ApplicationContextAware {
@@ -30,7 +31,7 @@ object Auth : ApplicationContextAware {
         return authentication.isAuthenticated
     }
 
-    fun isMe(principalId: Long, authentication: Authentication = securityContextAuth()): Boolean =
+    fun isMe(principalId: UUID, authentication: Authentication = securityContextAuth()): Boolean =
         isAuthenticated(authentication) && when (val principal = authentication.principal) {
 //            is AppUserClaims -> principal.id == principalId
             is ManagerClaims -> principal.id == principalId
@@ -45,7 +46,7 @@ object Auth : ApplicationContextAware {
         hasAuthority("ROLE_$role", authentication)
 
     fun hasAccess(
-        venueId: Long,
+        venueId: UUID,
         resourceType: String,
         permission: String,
         authentication: Authentication = securityContextAuth()
@@ -74,7 +75,7 @@ object Auth : ApplicationContextAware {
     }
 
     fun hasOrgAccess(
-        orgId: Long,
+        orgId: UUID,
         resourceType: String,
         permission: String,
         authentication: Authentication = securityContextAuth()
@@ -108,7 +109,7 @@ object Auth : ApplicationContextAware {
             }
         }
 
-    fun principalId(authentication: Authentication = securityContextAuth()): Long? {
+    fun principalId(authentication: Authentication = securityContextAuth()): UUID? {
         if (!isAuthenticated(authentication))
             return null
 
