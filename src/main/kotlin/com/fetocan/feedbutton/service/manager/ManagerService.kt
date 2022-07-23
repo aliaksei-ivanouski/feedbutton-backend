@@ -3,6 +3,8 @@ package com.fetocan.feedbutton.service.manager
 import com.fetocan.feedbutton.service.jooq.Tables.VENUE
 import com.fetocan.feedbutton.service.jooq.Tables.MANAGER
 import com.fetocan.feedbutton.service.LoggerDelegate
+import com.fetocan.feedbutton.service.exception.BadRequestException
+import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_INCORRECT_STATUS
 import com.fetocan.feedbutton.service.venue.Venue
 import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
@@ -14,7 +16,7 @@ import com.vladmihalcea.hibernate.type.basic.Inet
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
-import org.springframework.cache.CacheManager
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -29,7 +31,7 @@ class ManagerService(
     private val managerRepository: ManagerRepository,
     private val dsl: DSLContext,
     private val passwordResetService: PasswordResetService,
-    private val cacheManager: CacheManager
+    @Value("\${app.dashboard-url}") private val dashboardUrl: String,
 ) : ManagerRepository by managerRepository {
 
     private val logger by LoggerDelegate()
@@ -138,7 +140,7 @@ class ManagerService(
         }
         val newAccount = saveAndFlush(account)
         if (sendInvite) {
-//            sendInvitation(newAccount)
+            sendInvitation(newAccount)
         }
         return newAccount
     }
@@ -174,5 +176,23 @@ class ManagerService(
         }
 
         statement.execute()
+    }
+
+    fun sendInvitation(account: Manager) {
+        if (account.status != Manager.Status.PENDING) {
+            throw BadRequestException(
+                MANAGER_INCORRECT_STATUS,
+                "manager should be in pending state to send invitation"
+            )
+        }
+        val token = passwordResetService.createResetToken(account.id)
+
+        // TODO: 23/07/2022 Universal link to the iOS app
+        logger.info("${dashboardUrl}/reset-password?token=$token&email=${account.email}&name=${account.name}")
+
+//        segmentClient.track("manager-invitation-received", account.id.toString(), mapOf(
+//            "inviteLink" to "${dashboardUrl}/reset-password?token=$token&email=${account.email}&name=${account.name}",
+//            "name" to account.name
+//        ), false)
     }
 }

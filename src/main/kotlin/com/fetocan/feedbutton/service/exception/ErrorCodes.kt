@@ -5,9 +5,11 @@ object ErrorCodes {
     //AUTH
     const val UNAUTHORIZED = "error.auth.unauthorized"
     const val ACCESS_DENIED = "error.access.denied"
+    const val INVALID_TOKEN = "error.invalid.token"
 
     //MANAGER
     const val MANAGER_NOT_FOUND = "error.manager.not.found"
+    const val MANAGER_INCORRECT_STATUS = "error.manager.has.incorrect.status"
 
     //VENUE
     const val VENUE_NOT_FOUND = "error.venue.not.found"

@@ -7,7 +7,6 @@ import com.fetocan.feedbutton.service.security.authentication.jwt.JwtSettings
 import com.fetocan.feedbutton.service.security.authentication.manager.ManagerClaims
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -107,12 +106,10 @@ class AuthenticationController(
         val manager = managerService.findByEmailIgnoreCase(payload.email)
 
         if (manager == null || !passwordEncoder.matches(payload.password, manager.password)) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.reasonPhrase)
             throw BadCredentialsException("Bad credentials")
         }
 
         if (manager.status == Manager.Status.INACTIVE) {
-            response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.reasonPhrase)
             throw AccessDeniedException("account is inactive")
         }
 

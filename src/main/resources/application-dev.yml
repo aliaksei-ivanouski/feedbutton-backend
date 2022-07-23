@@ -13,6 +13,7 @@ springdoc:
 #      supported-submit-methods: []
 
 app:
+  dashboard-url: http://78.46.200.217:18080
   cache:
     timeToLive:
       default: 360 #1 * 60 * 60

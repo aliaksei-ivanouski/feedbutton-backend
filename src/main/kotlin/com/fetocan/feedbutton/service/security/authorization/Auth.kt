@@ -63,7 +63,7 @@ object Auth : ApplicationContextAware {
 
         if (accessMapping == null) {
             val venue = venueService.findByIdOrNull(venueId)
-                ?: throw NotFoundException(MANAGER_NOT_FOUND, "venue with given id not found: $venueId")
+                ?: throw NotFoundException(MANAGER_NOT_FOUND, "venue with id: $venueId not found")
 
 //            if (venue.orgId != null) {
 //                return hasOrgAccess(venue.orgId, resourceType, permission)

@@ -1,7 +1,7 @@
-package com.socialvenu.pwdreset
+package com.fetocan.feedbutton.service.pwdreset
 
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 internal class PasswordResetToken(
     /**

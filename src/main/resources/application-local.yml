@@ -13,6 +13,7 @@ springdoc:
   #    supported-submit-methods: []
 
 app:
+  dashboard-url: http://localhost:8080
   cache:
     timeToLive:
       default: 60

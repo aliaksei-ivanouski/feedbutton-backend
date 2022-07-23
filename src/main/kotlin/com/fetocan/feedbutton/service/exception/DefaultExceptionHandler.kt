@@ -2,9 +2,11 @@ package com.fetocan.feedbutton.service.exception
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fetocan.feedbutton.service.exception.ErrorCodes.ACCESS_DENIED
+import com.fetocan.feedbutton.service.exception.ErrorCodes.UNAUTHORIZED
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.validation.BindException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -74,6 +76,7 @@ class DefaultExceptionHandler(
         return when (exception) {
             is HttpClientErrorException.NotFound -> HttpStatus.NOT_FOUND
             is MethodArgumentNotValidException -> HttpStatus.BAD_REQUEST
+            is BadCredentialsException -> HttpStatus.UNAUTHORIZED
             is AccessDeniedException -> HttpStatus.FORBIDDEN
             else -> HttpStatus.INTERNAL_SERVER_ERROR
         }
@@ -83,6 +86,7 @@ class DefaultExceptionHandler(
         exception: Exception
     ) = when (exception) {
         is BaseRestException -> exception.code
+        is BadCredentialsException -> UNAUTHORIZED
         is AccessDeniedException -> ACCESS_DENIED
         else -> "error.internal.server"
     }
