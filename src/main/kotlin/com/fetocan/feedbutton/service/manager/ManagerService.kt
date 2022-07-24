@@ -10,6 +10,9 @@ import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
 import com.fetocan.feedbutton.service.jooq.Tables.MANAGER_VENUE
 import com.fetocan.feedbutton.service.jooq.paged
+import com.fetocan.feedbutton.service.mail.MailEvent
+import com.fetocan.feedbutton.service.mail.MailTemplate
+import com.fetocan.feedbutton.service.mail.TemplateId.TWILIO_MANAGER_INVITATION
 import com.fetocan.feedbutton.service.pwdreset.PasswordResetService
 import com.fetocan.feedbutton.service.util.RemoteAddressResolver
 import com.vladmihalcea.hibernate.type.basic.Inet
@@ -17,6 +20,7 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -31,7 +35,8 @@ class ManagerService(
     private val managerRepository: ManagerRepository,
     private val dsl: DSLContext,
     private val passwordResetService: PasswordResetService,
-    @Value("\${app.dashboard-url}") private val dashboardUrl: String,
+    private val publisher: ApplicationEventPublisher,
+    @Value("\${app.dashboard-url}") private val dashboardUrl: String
 ) : ManagerRepository by managerRepository {
 
     private val logger by LoggerDelegate()
@@ -188,11 +193,21 @@ class ManagerService(
         val token = passwordResetService.createResetToken(account.id)
 
         // TODO: 23/07/2022 Universal link to the iOS app
-        logger.info("${dashboardUrl}/reset-password?token=$token&email=${account.email}&name=${account.name}")
+        val inviteLink = "${dashboardUrl}/reset-password?token=$token&email=${account.email}&name=${account.name}"
+        logger.info("Invitation link to manager id: ${account.id}, link: $inviteLink")
 
-//        segmentClient.track("manager-invitation-received", account.id.toString(), mapOf(
-//            "inviteLink" to "${dashboardUrl}/reset-password?token=$token&email=${account.email}&name=${account.name}",
-//            "name" to account.name
-//        ), false)
+        publisher.publishEvent(
+            MailEvent(
+                MailTemplate(
+                    subject = "Welcome to Feed Button",
+                    recipient = account.email,
+                    templateId = TWILIO_MANAGER_INVITATION,
+                    params = mapOf(
+                        Pair("name", account.name),
+                        Pair("invite_url", inviteLink)
+                    )
+                )
+            )
+        )
     }
 }

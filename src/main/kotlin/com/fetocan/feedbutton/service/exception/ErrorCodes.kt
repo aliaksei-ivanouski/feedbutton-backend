@@ -17,4 +17,7 @@ object ErrorCodes {
     //MANAGER_VENUE MAPPING
     const val MANAGER_VENUE_MAPPING_ALREADY_EXISTS = "error.manager.venue.mapping.already.exists"
     const val MANAGER_DOES_NOT_BELONG_TO_THE_VENUE = "error.manager.does.not.belong.to.the.venue"
+
+    //TWILIO
+    const val SEND_EMAIL_ERROR = "error.send.email"
 }

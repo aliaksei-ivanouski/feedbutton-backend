@@ -37,6 +37,13 @@ security:
     refresh-token-header: X-Refresh-Token
     signing-key: ${JWT_KEY:A8qL2G(B,Q&HLKW2*l&Zcvmswuf^32*p10sdfj&}
 
+twilio:
+  url: https://api.sendgrid.com/v3/mail/send
+  api-key: ${TWILIO_API_KEY}
+
+app:
+  email-from: ${FROM_EMAIL}
+
 #logging:
 #  level:
 #    com.fetocan.feedbutton.service: TRACE

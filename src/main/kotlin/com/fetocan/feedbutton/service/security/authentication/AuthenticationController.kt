@@ -7,6 +7,7 @@ import com.fetocan.feedbutton.service.security.authentication.jwt.JwtSettings
 import com.fetocan.feedbutton.service.security.authentication.manager.ManagerClaims
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -20,6 +21,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/v1/auth")
+@Tag(name = "Authentication operation")
 class AuthenticationController(
 //    private val appUserService: AppUserService,
     private val managerService: ManagerService,
