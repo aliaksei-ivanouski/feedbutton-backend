@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("/v1/venues")
+@RequestMapping("/api/v1/venues")
 @Tag(name = "Venue operations")
 class VenueController(
     val venueService: VenueService

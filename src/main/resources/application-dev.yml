@@ -10,7 +10,7 @@ spring:
 
 springdoc:
   swagger-ui:
-#      supported-submit-methods: []
+      supported-submit-methods: []
 
 app:
   dashboard-url: http://78.46.200.217:18080

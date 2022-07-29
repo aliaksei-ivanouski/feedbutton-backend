@@ -26,7 +26,7 @@ import java.util.UUID
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1/managers")
+@RequestMapping("/api/v1/managers")
 @Tag(name = "Manager operations")
 class ManagerController(
     private val managerService: ManagerService,
@@ -56,16 +56,10 @@ class ManagerController(
     fun forgotPassword(
         @Valid @RequestBody payload: ForgotPasswordPayload
     ): SuccessResponse {
-        val manager = managerService.findByEmailIgnoreCase(payload.email)
-            ?: throw NotFoundException(
-                MANAGER_NOT_FOUND,
-                "manager account not found"
-            )
-
-        val token = passwordResetService.createResetToken(manager.id)
+        managerService.resetPassword(payload.email)
 
         // TODO: 23/07/2022 Universal link to the iOS app
-        logger.info("${dashboardUrl}/reset-password?token=$token")
+
 
 //        customerIOClient.sendEmail(
 //            SendEmailRequest(

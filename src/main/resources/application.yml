@@ -1,6 +1,4 @@
 server:
-  servlet:
-    context-path: /api
   port: ${PORT:8080}
   error:
     include-exception: true

@@ -23,7 +23,7 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.Size
 
 @RestController
-@RequestMapping("/v1/venues/{venueId}/managers")
+@RequestMapping("/api/v1/venues/{venueId}/managers")
 @Tag(name = "Manager-Venue operations")
 class VenueManagerController(
     private val venueService: VenueService,

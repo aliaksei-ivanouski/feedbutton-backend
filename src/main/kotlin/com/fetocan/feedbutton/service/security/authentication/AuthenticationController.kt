@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication operation")
 class AuthenticationController(
 //    private val appUserService: AppUserService,
