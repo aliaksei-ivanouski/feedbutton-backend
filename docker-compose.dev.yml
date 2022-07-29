@@ -12,6 +12,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    env_file:
+      - ~/projects/feedbutton/env/.env_feedbutton_backend
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/fetocan?allowMultiQueries=true&renderGroupConcatMaxLenSessionVariable=false
       - SPRING_DATASOURCE_USERNAME=fetocan

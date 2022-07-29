@@ -5,6 +5,9 @@ import com.fetocan.feedbutton.service.exception.BadRequestException
 import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_INCORRECT_STATUS
 import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
+import com.fetocan.feedbutton.service.mail.MailEvent
+import com.fetocan.feedbutton.service.mail.MailTemplate
+import com.fetocan.feedbutton.service.mail.TemplateId
 import com.fetocan.feedbutton.service.pwdreset.PasswordResetService
 import com.fetocan.feedbutton.service.util.PageableDoc
 import com.fetocan.feedbutton.service.web.SuccessResponse
@@ -12,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.access.prepost.PreAuthorize
@@ -32,7 +36,8 @@ class ManagerController(
     private val managerService: ManagerService,
     private val passwordResetService: PasswordResetService,
     private val passwordEncoder: PasswordEncoder,
-    @Value("\${app.dashboard-url}") private val dashboardUrl: String,
+    private val publisher: ApplicationEventPublisher,
+    @Value("\${app.dashboard-url}") private val dashboardUrl: String
 ) {
 
     private val logger by LoggerDelegate()
@@ -56,24 +61,30 @@ class ManagerController(
     fun forgotPassword(
         @Valid @RequestBody payload: ForgotPasswordPayload
     ): SuccessResponse {
-        managerService.resetPassword(payload.email)
+        val manager = managerService.findByEmailIgnoreCase(payload.email)
+            ?: throw NotFoundException(
+                MANAGER_NOT_FOUND,
+                "manager account not found"
+            )
 
-        // TODO: 23/07/2022 Universal link to the iOS app
+        val token = passwordResetService.createResetToken(manager.id)
 
+        val link = "${dashboardUrl}/apple-app-site-association?action=RESET_PASSWORD&token=$token"
+        logger.info("Link has been sent to the manager id: ${manager.id}, link: $link")
 
-//        customerIOClient.sendEmail(
-//            SendEmailRequest(
-//                transactionalMessageId = passwordResetEmailId,
-//                to = managerAccount.email,
-//                identifiers = mapOf(
-//                    "id" to managerAccount.id.toString()
-//                ),
-//                messageData = mapOf(
-//                    "redirect_url" to "${dashboardUrl}/reset-password?token=$token"
-//                )
-//            )
-//        )
-
+        publisher.publishEvent(
+            MailEvent(
+                MailTemplate(
+                    subject = "Reset password request",
+                    recipient = manager.email,
+                    templateId = TemplateId.TWILIO_RESET_PASSWORD,
+                    params = mapOf(
+                        Pair("name", manager.name),
+                        Pair("link", link)
+                    )
+                )
+            )
+        )
         return SuccessResponse()
     }
 

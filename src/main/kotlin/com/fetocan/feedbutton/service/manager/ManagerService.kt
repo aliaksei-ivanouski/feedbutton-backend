@@ -13,7 +13,6 @@ import com.fetocan.feedbutton.service.jooq.paged
 import com.fetocan.feedbutton.service.mail.MailEvent
 import com.fetocan.feedbutton.service.mail.MailTemplate
 import com.fetocan.feedbutton.service.mail.TemplateId.TWILIO_MANAGER_INVITATION
-import com.fetocan.feedbutton.service.mail.TemplateId.TWILIO_RESET_PASSWORD
 import com.fetocan.feedbutton.service.pwdreset.PasswordResetService
 import com.fetocan.feedbutton.service.util.RemoteAddressResolver
 import com.vladmihalcea.hibernate.type.basic.Inet
@@ -195,7 +194,6 @@ class ManagerService(
         }
         val token = passwordResetService.createResetToken(account.id)
 
-        // TODO: 23/07/2022 Universal link to the iOS app
         val inviteLink = "${dashboardUrl}/apple-app-site-association" +
                 "?action=MANAGER_INVITATION&token=$token&email=${account.email}&name=${account.name}"
         logger.info("Invitation link to manager id: ${account.id}, link: $inviteLink")
@@ -209,35 +207,6 @@ class ManagerService(
                     params = mapOf(
                         Pair("name", account.name),
                         Pair("invite_url", inviteLink)
-                    )
-                )
-            )
-        )
-    }
-
-    fun resetPassword(
-        email: String
-    ) {
-        val manager = findByEmailIgnoreCase(email)
-            ?: throw NotFoundException(
-                MANAGER_NOT_FOUND,
-                "manager account not found"
-            )
-
-        val token = passwordResetService.createResetToken(manager.id)
-
-        val link = "${dashboardUrl}/apple-app-site-association?action=RESET_PASSWORD&token=$token"
-        logger.info("Link has been sent to the manager id: ${manager.id}, link: $link")
-
-        publisher.publishEvent(
-            MailEvent(
-                MailTemplate(
-                    subject = "Reset password request",
-                    recipient = manager.email,
-                    templateId = TWILIO_RESET_PASSWORD,
-                    params = mapOf(
-                        Pair("name", manager.name),
-                        Pair("link", link)
                     )
                 )
             )

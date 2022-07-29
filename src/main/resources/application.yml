@@ -22,11 +22,11 @@ spring:
 
 springdoc:
   swagger-ui:
-    path: /docs
+    path: /api/docs
     groups-order: asc
     operations-sorter: method
   api-docs:
-    path: /api-docs
+    path: /api/api-docs
 
 security:
   jwt:
