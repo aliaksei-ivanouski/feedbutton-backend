@@ -69,7 +69,7 @@ class ManagerController(
 
         val token = passwordResetService.createResetToken(manager.id)
 
-        val link = "${dashboardUrl}/apple-app-site-association?action=RESET_PASSWORD&token=$token"
+        val link = "${dashboardUrl}?action=RESET_PASSWORD&token=$token"
         logger.info("Link has been sent to the manager id: ${manager.id}, link: $link")
 
         publisher.publishEvent(
