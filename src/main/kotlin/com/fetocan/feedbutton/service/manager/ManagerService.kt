@@ -194,19 +194,19 @@ class ManagerService(
         }
         val token = passwordResetService.createResetToken(account.id)
 
-        val inviteLink = "${dashboardUrl}/apple-app-site-association" +
-                "?action=MANAGER_INVITATION&token=$token&email=${account.email}&name=${account.name}"
-        logger.info("Invitation link to manager id: ${account.id}, link: $inviteLink")
+        val link = "${dashboardUrl}?action=MANAGER_INVITATION" +
+                "&token=$token&email=${account.email}&name=${account.name}"
+        logger.info("Invitation link to manager id: ${account.id}, link: $link")
 
         publisher.publishEvent(
             MailEvent(
                 MailTemplate(
-                    subject = "Welcome to Feed Button",
+                    subject = "Welcome to Feeds Button",
                     recipient = account.email,
                     templateId = TWILIO_MANAGER_INVITATION,
                     params = mapOf(
                         Pair("name", account.name),
-                        Pair("invite_url", inviteLink)
+                        Pair("link", link)
                     )
                 )
             )

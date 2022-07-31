@@ -7,7 +7,8 @@ import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
 import com.fetocan.feedbutton.service.mail.MailEvent
 import com.fetocan.feedbutton.service.mail.MailTemplate
-import com.fetocan.feedbutton.service.mail.TemplateId
+import com.fetocan.feedbutton.service.mail.TemplateId.TWILIO_PASSWORD_CHANGED
+import com.fetocan.feedbutton.service.mail.TemplateId.TWILIO_RESET_PASSWORD
 import com.fetocan.feedbutton.service.pwdreset.PasswordResetService
 import com.fetocan.feedbutton.service.util.PageableDoc
 import com.fetocan.feedbutton.service.web.SuccessResponse
@@ -77,7 +78,7 @@ class ManagerController(
                 MailTemplate(
                     subject = "Reset password request",
                     recipient = manager.email,
-                    templateId = TemplateId.TWILIO_RESET_PASSWORD,
+                    templateId = TWILIO_RESET_PASSWORD,
                     params = mapOf(
                         Pair("name", manager.name),
                         Pair("link", link)
@@ -114,6 +115,20 @@ class ManagerController(
         managerService.save(manager)
 
         passwordResetService.markAsUsed(payload.token)
+
+        publisher.publishEvent(
+            MailEvent(
+                MailTemplate(
+                    subject = "Password has been changed",
+                    recipient = manager.email,
+                    templateId = TWILIO_PASSWORD_CHANGED,
+                    params = mapOf(
+                        Pair("name", manager.name),
+                        Pair("link", dashboardUrl)
+                    )
+                )
+            )
+        )
 
         return SuccessResponse()
     }

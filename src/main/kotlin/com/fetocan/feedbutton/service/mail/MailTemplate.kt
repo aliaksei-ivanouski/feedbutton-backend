@@ -14,7 +14,8 @@ enum class TemplateId(
 ) {
     //Twilio
     TWILIO_MANAGER_INVITATION("d-36df405e85b74a969d79830b9bc74be4"),
-    TWILIO_RESET_PASSWORD("d-f8aa4501db8c421781910a5866c50c5f");
+    TWILIO_RESET_PASSWORD("d-f8aa4501db8c421781910a5866c50c5f"),
+    TWILIO_PASSWORD_CHANGED("d-27b0c4f9070742b88df03fc263b598bb");
 
     override fun toString(): String {
         return value
