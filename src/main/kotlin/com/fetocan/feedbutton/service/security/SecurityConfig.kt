@@ -4,6 +4,7 @@ import com.fetocan.feedbutton.service.manager.ManagerService
 import com.fetocan.feedbutton.service.security.authentication.JwtTokenAuthenticationFilter
 import com.fetocan.feedbutton.service.security.authentication.jwt.JwtSettings
 import com.fetocan.feedbutton.service.security.authentication.manager.ManagerJwtAuthenticationProvider
+import com.fetocan.feedbutton.service.security.authentication.user.UserJwtAuthenticationProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -48,7 +49,7 @@ class SecurityConfig(
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-//        auth.authenticationProvider(AppUserJwtAuthenticationProvider(jwtSettings))
+        auth.authenticationProvider(UserJwtAuthenticationProvider(jwtSettings))
         auth.authenticationProvider(
             ManagerJwtAuthenticationProvider(
                 jwtSettings,

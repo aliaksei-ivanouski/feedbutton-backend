@@ -1,10 +1,11 @@
 package com.fetocan.feedbutton.service.security.authorization
 
-import com.fetocan.feedbutton.service.exception.ErrorCodes.MANAGER_NOT_FOUND
+import com.fetocan.feedbutton.service.exception.ErrorCodes.VENUE_NOT_FOUND
 import com.fetocan.feedbutton.service.exception.NotFoundException
 import com.fetocan.feedbutton.service.manager.AccessScopesAware
 import com.fetocan.feedbutton.service.manager.ManagerService
 import com.fetocan.feedbutton.service.security.authentication.manager.ManagerClaims
+import com.fetocan.feedbutton.service.security.authentication.user.UserClaims
 import com.fetocan.feedbutton.service.venue.VenueService
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -33,7 +34,7 @@ object Auth : ApplicationContextAware {
 
     fun isMe(principalId: UUID, authentication: Authentication = securityContextAuth()): Boolean =
         isAuthenticated(authentication) && when (val principal = authentication.principal) {
-//            is AppUserClaims -> principal.id == principalId
+            is UserClaims -> principal.id == principalId
             is ManagerClaims -> principal.id == principalId
             else -> false
         }
@@ -63,7 +64,7 @@ object Auth : ApplicationContextAware {
 
         if (accessMapping == null) {
             val venue = venueService.findByIdOrNull(venueId)
-                ?: throw NotFoundException(MANAGER_NOT_FOUND, "venue with id: $venueId not found")
+                ?: throw NotFoundException(VENUE_NOT_FOUND, "venue with id: $venueId not found")
 
 //            if (venue.orgId != null) {
 //                return hasOrgAccess(venue.orgId, resourceType, permission)
@@ -114,7 +115,7 @@ object Auth : ApplicationContextAware {
             return null
 
         return when (val principal = authentication.principal) {
-//            is AppUserClaims -> principal.id
+            is UserClaims -> principal.id
             is ManagerClaims -> principal.id
             else -> null
         }

@@ -10,7 +10,7 @@ import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
-@Table(name = "venue")
+@Table(name = "venue", schema = "public")
 class Venue(
     id: UUID? = null,
     val name: String

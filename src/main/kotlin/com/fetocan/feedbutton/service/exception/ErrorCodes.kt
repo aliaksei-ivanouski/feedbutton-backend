@@ -6,10 +6,16 @@ object ErrorCodes {
     const val UNAUTHORIZED = "error.auth.unauthorized"
     const val ACCESS_DENIED = "error.access.denied"
     const val INVALID_TOKEN = "error.invalid.token"
+    const val NO_REFRESH_TOKEN = "error.no.refresh.token"
 
     //MANAGER
     const val MANAGER_NOT_FOUND = "error.manager.not.found"
     const val MANAGER_INCORRECT_STATUS = "error.manager.has.incorrect.status"
+
+    //USER
+    const val USER_NOT_FOUND = "error.user.not.found"
+    const val USER_ALREADY_EXISTS = "error.user.already.exists"
+    const val ILLEGAL_USER_STATUS_REQUEST = "error.illegal.user.status.request"
 
     //VENUE
     const val VENUE_NOT_FOUND = "error.venue.not.found"

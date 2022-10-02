@@ -17,7 +17,7 @@ import javax.persistence.Enumerated
 import javax.persistence.Table
 
 @Entity
-@Table(name = "manager")
+@Table(name = "manager", schema = "public")
 class Manager(
     id: UUID? = null,
     val email: String,
